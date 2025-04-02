@@ -3,6 +3,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
+  const body = document.body;
+
+  // Load dark mode preference from localStorage
+  if (localStorage.getItem("darkMode") === "enabled") {
+    enableDarkMode();
+  }
+
+  darkModeToggle.addEventListener("click", () => {
+    if (body.classList.contains("dark-mode")) {
+      disableDarkMode();
+    } else {
+      enableDarkMode();
+    }
+  });
+
+  function enableDarkMode() {
+    body.classList.add("dark-mode");
+    document.querySelector("header").classList.add("dark-mode");
+    document.querySelectorAll("section").forEach((section) => section.classList.add("dark-mode"));
+    document.querySelectorAll(".activity-card").forEach((card) => card.classList.add("dark-mode"));
+    document.querySelectorAll(".participants-section").forEach((section) => section.classList.add("dark-mode"));
+    localStorage.setItem("darkMode", "enabled");
+  }
+
+  function disableDarkMode() {
+    body.classList.remove("dark-mode");
+    document.querySelector("header").classList.remove("dark-mode");
+    document.querySelectorAll("section").forEach((section) => section.classList.remove("dark-mode"));
+    document.querySelectorAll(".activity-card").forEach((card) => card.classList.remove("dark-mode"));
+    document.querySelectorAll(".participants-section").forEach((section) => section.classList.remove("dark-mode"));
+    localStorage.setItem("darkMode", "disabled");
+  }
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -20,11 +53,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
+        const participantsList = details.participants
+          .map((participant) => `<li>${participant}</li>`)
+          .join("");
+
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <div class="participants-section">
+            <strong>Participants:</strong>
+            <ul>${participantsList || "<li>No participants yet</li>"}</ul>
+          </div>
         `;
 
         activitiesList.appendChild(activityCard);
